@@ -8,7 +8,7 @@ fn encryption_test() {
 
     let ciphertext = cipher.encrypt(plaintext).unwrap();
     assert_eq!(ciphertext, "yd 0yc ehyrhjgdd".to_owned());
-    
+
     let decrypted = cipher.decrypt(&ciphertext).unwrap();
     // .trim() needed since encryptor adjusts whitespaces to fill chunks
     assert_eq!(decrypted.trim(), plaintext);

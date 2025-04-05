@@ -12,4 +12,4 @@ dependencies = [
 [[package]]
 name = "tinystorm"
 version = "0.1.0"
-source = "git+https://github.com/pipangry/tinystorm#283cf8e3e0f65480c1825b4634a72c04ce2fda7c"
+source = "git+https://github.com/pipangry/tinystorm#53e9029360f726721e028e2f70e1ee6250e23fb2"

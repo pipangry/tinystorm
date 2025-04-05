@@ -1,5 +1,10 @@
 [package]
 name = "tinystorm"
+description = "Tiny encryption algorithm for non-cryptography purpose"
+repository = "https://github.com/pipangry/tinystorm/"
+license = "Apache-2.0"
+keywords = [ "encryption" ]
+readme = "README.md"
 version = "0.1.0"
 edition = "2024"
 
