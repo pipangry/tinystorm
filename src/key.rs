@@ -122,10 +122,7 @@ pub(crate) fn swap_key(buffer: &mut [u8], range_mod: u8) {
         return;
     }
 
-    let a = buffer[0];
-    let b = buffer[1];
-    let c = buffer[2];
-    let d = buffer[3];
+    let [a, b, c, d] = [buffer[0], buffer[1], buffer[2], buffer[3]];
 
     buffer[0] = (a + b) % range_mod;
     buffer[1] = (buffer[0] + c) % range_mod;
