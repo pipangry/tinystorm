@@ -5,3 +5,11 @@ version = 4
 [[package]]
 name = "cli"
 version = "0.1.0"
+dependencies = [
+ "tinystorm",
+]
+
+[[package]]
+name = "tinystorm"
+version = "0.1.0"
+source = "git+https://github.com/pipangry/tinystorm#773a735af08f81daa5ed5ba122da1584a0e42e61"
