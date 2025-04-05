@@ -1,6 +1,6 @@
+pub mod cipher;
+pub mod encoding;
+pub mod error;
+pub mod key;
 #[cfg(test)]
 mod tests;
-pub mod cipher;
-pub mod error;
-pub mod encoding;
-pub mod key;
