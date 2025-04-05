@@ -49,12 +49,12 @@ impl Cipher {
     /// use tinystorm::cipher::Cipher;
     /// use tinystorm::encoding::EncodingType;
     ///
-    /// let cipher = Cipher::from("23091234", "89")
-    ///     .unwrap()
-    ///     .set_encoder(EncodingType::RUv5);
+    /// let mut cipher = Cipher::from("23091234", "89")
+    ///     .unwrap();
+    /// cipher.set_encoder(EncodingType::RUv5);
     /// ```
     pub fn set_encoder(&mut self, encoding_type: EncodingType) {
-        self.encoder = Encoder::new(encoding_type);
+        self.encoder = Encoder::new(encoding_type)
     }
 
     /// Change encoding to your custom one
