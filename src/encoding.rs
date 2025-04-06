@@ -215,7 +215,7 @@ impl Encoder {
         str.chars()
             .filter_map(|c| {
                 self.encode_char(if !self.support_uppercase {
-                    c.to_ascii_lowercase()
+                    c.to_lowercase().next().unwrap_or(c)
                 } else {
                     c
                 })
