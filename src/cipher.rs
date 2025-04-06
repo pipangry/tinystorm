@@ -178,6 +178,10 @@ impl Cipher {
             reverse_chunk_swap(chunk, self.encoder.size);
         }
     }
+    
+    pub fn get_encoding_bounds(&self) -> u8 {
+        self.encoder.size
+    }
 }
 
 pub(crate) fn adjust_chunks(buffer: &mut [u8], remainder: usize) -> &mut [u8] {

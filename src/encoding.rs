@@ -165,7 +165,6 @@ pub struct Encoder {
 impl Encoder {
     /// Create encoder from predefined encoding tables
     pub fn new(encoding: EncodingType) -> Self {
-        // +1 is needed for correct finite field operations
         match encoding {
             EncodingType::RUv4 => Self {
                 table: ENCODING_RUV4,

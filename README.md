@@ -6,6 +6,7 @@ Library implementation in Rust
 Create cipher: encrypt and decrypt our message
 ```rust
 fn main() {
+    // By default, cipher uses encoding ENv1, which doesn't support uppercase
     let plaintext = "hello, world!";
     let cipher = Cipher::from("25210840", "39").unwrap();
 
