@@ -17,17 +17,27 @@ pub struct Encoding {
     inner: &'static [(char, u8)],
 }
 
+impl Encoding {
+    #[doc(hidden)]
+    /// Create new `Encoding` without compile-time check. Usage of this function is not recommended
+    pub const fn new_unchecked(inner: &'static [(char, u8)]) -> Self {
+        Self {
+            inner,
+        }
+    }
+}
 #[macro_export]
 /// Create new encoding with compile-time check
 macro_rules! encoding_table {
     ($($enc:expr),*) => {{
-        const TABLE: &[(char, u8)] = &$($enc),*;
-        const IS_VALID: bool = $crate::encoding::check_for_malformed_encoding(TABLE);
+        const INNER: &'static [(char, u8)] = &$($enc),*;
         
+        const IS_VALID: bool = $crate::encoding::check_for_malformed_encoding(INNER);
         if !IS_VALID {
             panic!("Malformed encoding");
         }
-        Encoding { inner: TABLE }
+        
+        Encoding::new_unchecked(INNER)
     }};
 }
 
