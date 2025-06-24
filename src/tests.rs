@@ -1,5 +1,6 @@
 use crate::cipher::{adjust_chunks, Cipher, CHUNK_SIZE};
 use crate::encoding::{Encoder, Encoding, EncodingType};
+use crate::encoding_table;
 use crate::key::Credentials;
 
 #[test]
@@ -40,11 +41,11 @@ fn encoding_test() {
 
 #[test]
 fn custom_encoding_test() {
-    const MY_TABLE: Encoding = &[
+    const MY_TABLE: Encoding = encoding_table!([
         ('a', 1),
         ('b', 2),
         ('c', 3),
-    ];
+    ]);
     let encoder = Encoder::load(MY_TABLE, false).unwrap();
 
     // d should be removed because it don't exist in encoding table
@@ -52,18 +53,6 @@ fn custom_encoding_test() {
     let encoded = encoder.encode(message);
 
     assert_eq!(encoded, vec![1, 2, 3]);
-}
-
-#[test]
-fn malformed_encoding_test() {
-    // Table with repeated chars should be rejected
-    const MY_TABLE: Encoding = &[
-        ('a', 1),
-        ('b', 2),
-        ('b', 3),
-    ];
-    let encoder = Encoder::load(MY_TABLE, false);
-    assert!(encoder.is_err());
 }
 
 #[test]

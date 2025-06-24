@@ -1,18 +1,38 @@
 use crate::error::CipherError;
 
 pub const DEFAULT_ENCODING: EncodingType = EncodingType::ENv1;
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum EncodingType {
     RUv4,
     RUv5,
     ENv1,
 }
 
-/// Encoding table represented as static array of (Char, encoded number)
-pub type Encoding = &'static [(char, u8)];
+/// Encoding table represented as static array of (Char, encoded number). Can be created only with
+/// [`encoding_table`] macro to perform compile-time checks
+/// 
+/// [`encoding_table`]: crate::encoding_table
+#[derive(Debug, PartialEq)]
+pub struct Encoding {
+    inner: &'static [(char, u8)],
+}
+
+#[macro_export]
+/// Create new encoding with compile-time check
+macro_rules! encoding_table {
+    ($($enc:expr),*) => {{
+        const TABLE: &[(char, u8)] = &$($enc),*;
+        const IS_VALID: bool = $crate::encoding::check_for_malformed_encoding(TABLE);
+        
+        if !IS_VALID {
+            panic!("Malformed encoding");
+        }
+        Encoding { inner: TABLE }
+    }};
+}
 
 /// Encoding table for english alphabet
-const ENCODING_ENV1: Encoding = &[
+const ENCODING_ENV1: Encoding = encoding_table!([
     (' ', 0),
     ('a', 1),
     ('b', 2),
@@ -54,11 +74,11 @@ const ENCODING_ENV1: Encoding = &[
     (',', 38),
     ('!', 39),
     ('?', 40),
-    ('-', 41),
-];
+    ('-', 41)
+]);
 
 /// Encoding table for russian alphabet
-const ENCODING_RUV5: Encoding = &[
+const ENCODING_RUV5: Encoding = encoding_table!([
     (' ', 0),
     ('а', 1),
     ('б', 2),
@@ -108,10 +128,10 @@ const ENCODING_RUV5: Encoding = &[
     ('!', 46),
     ('?', 47),
     ('-', 48),
-];
+]);
 
 /// Encoding table for russian alphabet, but without digits (OLD)
-const ENCODING_RUV4: Encoding = &[
+const ENCODING_RUV4: Encoding = encoding_table!([
     (' ', 0),
     ('а', 1),
     ('б', 2),
@@ -153,11 +173,11 @@ const ENCODING_RUV4: Encoding = &[
     ('+', 38),
     ('-', 39),
     ('@', 40),
-];
+]);
 
 #[derive(Debug, PartialEq)]
 pub struct Encoder {
-    pub table: &'static [(char, u8)],
+    pub table: Encoding,
     support_uppercase: bool,
     pub size: u8,
 }
@@ -168,17 +188,17 @@ impl Encoder {
         match encoding {
             EncodingType::RUv4 => Self {
                 table: ENCODING_RUV4,
-                size: ENCODING_RUV4.len() as u8,
+                size: ENCODING_RUV4.inner.len() as u8,
                 support_uppercase: false,
             },
             EncodingType::RUv5 => Self {
                 table: ENCODING_RUV5,
-                size: ENCODING_RUV5.len() as u8,
+                size: ENCODING_RUV5.inner.len() as u8,
                 support_uppercase: false,
             },
             EncodingType::ENv1 => Self {
                 table: ENCODING_ENV1,
-                size: ENCODING_ENV1.len() as u8,
+                size: ENCODING_ENV1.inner.len() as u8,
                 support_uppercase: false,
             },
         }
@@ -188,22 +208,19 @@ impl Encoder {
     /// # Example
     /// ```
     /// use tinystorm::encoding::{Encoder, Encoding};
+    /// use tinystorm::encoding_table;
     ///
-    /// const MY_TABLE: Encoding = &[
+    /// const MY_TABLE: Encoding = encoding_table!([
     ///     ('a', 1),
     ///     ('b', 2),
     ///     ('c', 3),
-    /// ];
+    /// ]);
     /// let encoder = Encoder::load(MY_TABLE, false).unwrap();
     /// ```
-    pub fn load(table: Encoding, support_uppercase: bool) -> Result<Self, CipherError> {
-        if !check_for_malformed_encoding(table) {
-            return Err(CipherError::MalformedEncoding);
-        }
-
+    pub fn load(encoding: Encoding, support_uppercase: bool) -> Result<Self, CipherError> {
         Ok(Self {
-            table,
-            size: table.len() as u8,
+            size: encoding.inner.len() as u8,
+            table: encoding,
             support_uppercase,
         })
     }
@@ -227,22 +244,25 @@ impl Encoder {
     pub fn decode(&self, bytes: &[u8]) -> String {
         bytes.iter().filter_map(|&c| self.decode_char(c)).collect()
     }
+}
 
+// Private methods
+impl Encoder {
     // Helper functions
     fn encode_char(&self, c: char) -> Option<u8> {
-        self.table.iter().find(|&&(ch, _)| ch == c).map(|&(_, n)| n)
+        self.table.inner.iter().find(|&&(ch, _)| ch == c).map(|&(_, n)| n)
     }
 
     fn decode_char(&self, n: u8) -> Option<char> {
-        self.table
+        self.table.inner
             .iter()
             .find(|&&(_, num)| num == n)
             .map(|&(ch, _)| ch)
     }
 }
 
-/// Compile-time checks for repeated chars in custom encoding table
-const fn check_for_malformed_encoding(data: &[(char, u8)]) -> bool {
+/// Compile-time check for repeated chars in custom encoding table. Returns true if table is correct
+pub const fn check_for_malformed_encoding(data: &[(char, u8)]) -> bool {
     let len = data.len();
 
     let mut i = 0;

@@ -1,4 +1,4 @@
-use crate::encoding::{DEFAULT_ENCODING, Encoder, EncodingType};
+use crate::encoding::{DEFAULT_ENCODING, Encoder, EncodingType, Encoding};
 use crate::error::CipherError;
 use crate::key::{Credentials, parse_credentials, verify_key};
 
@@ -62,12 +62,13 @@ impl Cipher {
     /// ```
     /// use tinystorm::cipher::Cipher;
     /// use tinystorm::encoding::Encoding;
+    /// use tinystorm::encoding_table;
     ///
-    /// const MY_TABLE: Encoding = &[
+    /// const MY_TABLE: Encoding = encoding_table!([
     ///     ('a', 1),
     ///     ('b', 2),
     ///     ('c', 3),
-    /// ];
+    /// ]);
     ///
     /// let cipher = Cipher::new(&[1, 2, 3, 4], 5)
     ///     .unwrap()
@@ -75,10 +76,10 @@ impl Cipher {
     /// ```
     pub fn load_encoder(
         &mut self,
-        table: &'static [(char, u8)],
+        encoding: Encoding,
         supports_uppercase: bool,
     ) -> Result<(), CipherError> {
-        self.encoder = Encoder::load(table, supports_uppercase)?;
+        self.encoder = Encoder::load(encoding, supports_uppercase)?;
         Ok(())
     }
 
@@ -178,7 +179,7 @@ impl Cipher {
             reverse_chunk_swap(chunk, self.encoder.size);
         }
     }
-    
+
     pub fn get_encoding_bounds(&self) -> u8 {
         self.encoder.size
     }

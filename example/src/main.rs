@@ -3,7 +3,7 @@ use tinystorm::encoding::EncodingType;
 
 fn main() {
     let plaintext = "Трюфель! Я не знаю что еще написать...";
-    let mut cipher = Cipher::from("12350729", "47").unwrap();
+    let mut cipher = Cipher::from("48070216", "35").unwrap();
     cipher.set_encoder(EncodingType::RUv5);
 
     let ciphertext = cipher.encrypt(plaintext).unwrap();
