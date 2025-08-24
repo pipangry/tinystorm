@@ -5,11 +5,12 @@ use crate::key::Credentials;
 
 #[test]
 fn encryption_test() {
-    let plaintext = "hello, world!";
-    let cipher = Cipher::from("25211840", "39").unwrap();
+    let plaintext = "Buzzy fuzz!";
+    let mut cipher = Cipher::new("25211840", "39").unwrap();
+    cipher.set_encoder(EncodingType::ENv2);
 
     let ciphertext = cipher.encrypt(plaintext).unwrap();
-    assert_eq!(ciphertext, "yd 0yc ehyrhjgdd".to_owned());
+    assert_eq!(ciphertext, "gzZQ8izmBOEw");
 
     let decrypted = cipher.decrypt(&ciphertext).unwrap();
     // .trim() needed since encryptor adjusts whitespaces to fill chunks
@@ -18,12 +19,12 @@ fn encryption_test() {
 
 #[test]
 fn encryption_test_with_russian_encoding() {
-    let plaintext = "привет, эльфева башня!";
-    let mut cipher = Cipher::from("12350729", "47").unwrap();
+    let plaintext = "привет, мир!";
+    let mut cipher = Cipher::new("12350729", "47").unwrap();
     cipher.set_encoder(EncodingType::RUv5);
 
     let ciphertext = cipher.encrypt(plaintext).unwrap();
-    assert_eq!(ciphertext, "ыэ3йт?к3ь8ыыцсуз-ь25фхр1".to_owned());
+    assert_eq!(ciphertext, "щы1зм7 щд?ит.62ю");
 
     let decrypted = cipher.decrypt(&ciphertext).unwrap();
     // .trim() needed since encryptor adjusts whitespaces to fill chunks

@@ -11,8 +11,25 @@ pub struct Cipher {
 }
 
 impl Cipher {
+    /// Parse credentials as strings and create new Cipher with ENv1 Encoding
+    /// # Example
+    /// ```
+    /// use tinystorm::cipher::Cipher;
+    ///
+    /// let cipher = Cipher::new("23091234", "89")
+    ///     .unwrap();
+    /// ```
+    pub fn new(key: &str, iv: &str) -> Result<Cipher, CipherError> {
+        let credentials = parse_credentials(key, iv)?;
+
+        Ok(Cipher {
+            encoder: Encoder::new(DEFAULT_ENCODING),
+            credentials,
+        })
+    }
+
     /// Create new Cipher from raw key and IV with default ENv1 encoding
-    pub fn new(key: &[u8], iv: u8) -> Result<Cipher, CipherError> {
+    pub fn from(key: &[u8], iv: u8) -> Result<Cipher, CipherError> {
         if !verify_key(key) {
             return Err(CipherError::InvalidKey);
         }
@@ -26,30 +43,13 @@ impl Cipher {
         })
     }
 
-    /// Parse credentials as strings and create new Cipher
-    /// # Example
-    /// ```
-    /// use tinystorm::cipher::Cipher;
-    ///
-    /// let cipher = Cipher::from("23091234", "89")
-    ///     .unwrap();
-    /// ```
-    pub fn from(key: &str, iv: &str) -> Result<Cipher, CipherError> {
-        let credentials = parse_credentials(key, iv)?;
-
-        Ok(Cipher {
-            encoder: Encoder::new(DEFAULT_ENCODING),
-            credentials,
-        })
-    }
-
     /// Change encoding (ENv1) to other
     /// # Example
     /// ```
     /// use tinystorm::cipher::Cipher;
     /// use tinystorm::encoding::EncodingType;
     ///
-    /// let mut cipher = Cipher::from("23091234", "89")
+    /// let mut cipher = Cipher::new("23091234", "89")
     ///     .unwrap();
     /// cipher.set_encoder(EncodingType::RUv5);
     /// ```
@@ -70,7 +70,7 @@ impl Cipher {
     ///     ('c', 3),
     /// ]);
     ///
-    /// let cipher = Cipher::new(&[1, 2, 3, 4], 5)
+    /// let cipher = Cipher::from(&[1, 2, 3, 4], 5)
     ///     .unwrap()
     ///     .load_encoder(MY_TABLE, false);
     /// ```
@@ -111,7 +111,7 @@ impl Cipher {
     /// use tinystorm::cipher::Cipher;
     ///
     /// let plaintext = "Hello, world!";
-    /// let cipher = Cipher::from("25211840", "39").unwrap();
+    /// let cipher = Cipher::new("25211840", "39").unwrap();
     ///
     /// let ciphertext = cipher.encrypt(plaintext).unwrap();
     /// println!("Ciphertext: {}", ciphertext); //xc-zu9ari !88
@@ -137,7 +137,7 @@ impl Cipher {
     /// ```
     /// use tinystorm::cipher::Cipher;
     /// let plaintext = "hello, world!";
-    /// let cipher = Cipher::from("25211840", "39").unwrap();
+    /// let cipher = Cipher::new("25211840", "39").unwrap();
     ///
     /// let ciphertext = cipher.encrypt(plaintext).unwrap();
     /// assert_eq!(ciphertext, "yd 0yc ehyrhjgdd".to_owned());

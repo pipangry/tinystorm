@@ -30,11 +30,11 @@ impl Credentials {
     /// decryption problems
     pub(crate) fn verify_credentials_size(&self, encoding_range: u8) -> Result<(), CipherError> {
         if let Some(b) = self.key.iter().find(|&b| *b >= encoding_range) {
-            return Err(CipherError::KeyOutOfBounds(*b))
+            return Err(CipherError::KeyOutOfBounds(*b, encoding_range))
         }
         
         if self.iv >= encoding_range {
-            return Err(CipherError::IVOutOfBounds);
+            return Err(CipherError::IVOutOfBounds(encoding_range));
         }
         
         Ok(())
