@@ -11,7 +11,7 @@ pub enum EncodingType {
 
 /// Encoding table represented as static array of (Char, encoded number). Can be created only with
 /// [`encoding_table`] macro to perform compile-time checks
-/// 
+///
 /// [`encoding_table`]: crate::encoding_table
 #[derive(Debug, PartialEq)]
 pub struct Encoding {
@@ -22,9 +22,7 @@ impl Encoding {
     #[doc(hidden)]
     /// Create new `Encoding` without compile-time check. Usage of this function is not recommended
     pub const fn new_unchecked(inner: &'static [(char, u8)]) -> Self {
-        Self {
-            inner,
-        }
+        Self { inner }
     }
 }
 #[macro_export]
@@ -32,12 +30,12 @@ impl Encoding {
 macro_rules! encoding_table {
     ($($enc:expr),*) => {{
         const INNER: &'static [(char, u8)] = &$($enc),*;
-        
+
         const IS_VALID: bool = $crate::encoding::check_for_malformed_encoding(INNER);
         if !IS_VALID {
             panic!("Malformed encoding");
         }
-        
+
         Encoding::new_unchecked(INNER)
     }};
 }
@@ -342,11 +340,16 @@ impl Encoder {
 impl Encoder {
     // Helper functions
     fn encode_char(&self, c: char) -> Option<u8> {
-        self.table.inner.iter().find(|&&(ch, _)| ch == c).map(|&(_, n)| n)
+        self.table
+            .inner
+            .iter()
+            .find(|&&(ch, _)| ch == c)
+            .map(|&(_, n)| n)
     }
 
     fn decode_char(&self, n: u8) -> Option<char> {
-        self.table.inner
+        self.table
+            .inner
             .iter()
             .find(|&&(_, num)| num == n)
             .map(|&(ch, _)| ch)

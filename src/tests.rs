@@ -1,4 +1,4 @@
-use crate::cipher::{adjust_chunks, Cipher, CHUNK_SIZE};
+use crate::cipher::{CHUNK_SIZE, Cipher, adjust_chunks};
 use crate::encoding::{Encoder, Encoding, EncodingType};
 use crate::encoding_table;
 use crate::key::Credentials;
@@ -42,11 +42,7 @@ fn encoding_test() {
 
 #[test]
 fn custom_encoding_test() {
-    const MY_TABLE: Encoding = encoding_table!([
-        ('a', 1),
-        ('b', 2),
-        ('c', 3),
-    ]);
+    const MY_TABLE: Encoding = encoding_table!([('a', 1), ('b', 2), ('c', 3),]);
     let encoder = Encoder::load(MY_TABLE, false).unwrap();
 
     // d should be removed because it don't exist in encoding table
@@ -65,7 +61,10 @@ fn key_expansion_test() {
 
     credentials.expand_key(&mut buffer, size, 41);
 
-    assert_eq!(buffer, vec![1, 2, 3, 4, 31, 17, 3, 30, 16, 2, 29, 15, 1, 28, 14, 0])
+    assert_eq!(
+        buffer,
+        vec![1, 2, 3, 4, 31, 17, 3, 30, 16, 2, 29, 15, 1, 28, 14, 0]
+    )
 }
 
 #[test]

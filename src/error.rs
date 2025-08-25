@@ -17,9 +17,13 @@ impl Display for CipherError {
             CipherError::InvalidKey => write!(f, "Invalid Key"),
             CipherError::InvalidIV => write!(f, "Invalid IV"),
             CipherError::ParseIntError(e) => write!(f, "{e}"),
-            CipherError::MalformedEncoding => write!(f, "Malformed encoding: each character must me unique"),
+            CipherError::MalformedEncoding => {
+                write!(f, "Malformed encoding: each character must me unique")
+            }
             CipherError::IVOutOfBounds(bounds) => write!(f, "IV must be within {bounds}"),
-            CipherError::KeyOutOfBounds(chunk, bounds) => write!(f, "Key chunk {chunk} out of bounds: {bounds}"),
+            CipherError::KeyOutOfBounds(chunk, bounds) => {
+                write!(f, "Key chunk {chunk} out of bounds: {bounds}")
+            }
         }
     }
 }

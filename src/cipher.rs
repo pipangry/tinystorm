@@ -1,4 +1,4 @@
-use crate::encoding::{DEFAULT_ENCODING, Encoder, EncodingType, Encoding};
+use crate::encoding::{DEFAULT_ENCODING, Encoder, Encoding, EncodingType};
 use crate::error::CipherError;
 use crate::key::{Credentials, parse_credentials, verify_key};
 
@@ -92,7 +92,8 @@ impl Cipher {
         // Expanding key
         let key_capacity = chunks.len();
         let mut key = Vec::with_capacity(key_capacity);
-        self.credentials.expand_key(&mut key, key_capacity, self.encoder.size);
+        self.credentials
+            .expand_key(&mut key, key_capacity, self.encoder.size);
 
         // Swap chunks
         for chunk in chunks {
@@ -118,7 +119,8 @@ impl Cipher {
     /// ```
     pub fn encrypt(&self, plaintext: &str) -> Result<String, CipherError> {
         // Verifying size of our credentials
-        self.credentials.verify_credentials_size(self.encoder.size)?;
+        self.credentials
+            .verify_credentials_size(self.encoder.size)?;
 
         // Step 1: Encode
         let mut encoded = self.encoder.encode(plaintext);
@@ -148,7 +150,8 @@ impl Cipher {
     /// ```
     pub fn decrypt(&self, ciphertext: &str) -> Result<String, CipherError> {
         // Verifying size of our credentials
-        self.credentials.verify_credentials_size(self.encoder.size)?;
+        self.credentials
+            .verify_credentials_size(self.encoder.size)?;
 
         // As well, encode
         let mut encoded = self.encoder.encode(ciphertext);
@@ -166,7 +169,8 @@ impl Cipher {
         // As well, expanding the key
         let key_capacity = buffer.len() / CHUNK_SIZE;
         let mut key = Vec::new();
-        self.credentials.expand_key(&mut key, key_capacity, self.encoder.size);
+        self.credentials
+            .expand_key(&mut key, key_capacity, self.encoder.size);
 
         // Removing the key
         for (d, s) in buffer.iter_mut().zip(key.iter()) {
